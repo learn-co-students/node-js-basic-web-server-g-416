@@ -32,6 +32,8 @@
     "bcrypt": "^0.8.5",
     "body-parser": "^1.15.0",
     "finalhandler": "^0.4.1",
-    "router": "^1.1.4"
+    "querystring": "^0.2.0",
+    "router": "^1.1.4",
+    "url": "^0.11.0"
   }
 }
