@@ -7,8 +7,8 @@ const Router       = require('router');
 const router = new Router();
 
 router.get('/', (request, response) => {
-  
-  response.end();
+  response.setHeader('Content-Type', 'text/plain; charset=utf-8');
+  response.end('Hello, World!');
 });
 
 const server = http.createServer((request, response) => {
