@@ -7,7 +7,7 @@ const Router       = require('router');
 const router = new Router();
 
 router.get('/', (request, response) => {
-  // A good place to start!
+  
   response.end();
 });
 
