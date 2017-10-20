@@ -26,20 +26,35 @@ router.get('/', (request, response) => {
 });
 
 router.get('/messages', (request, response) => {
+	let shouldEncrypt = parseEncrypt(request),
+		messagesJson = JSON.stringify(messages);
 	response.statusCode = 200;
-	response.setHeader('Content-Type', 'application/json; charset=utf-8');
-	response.write(JSON.stringify(messages));
-	response.end();
+
+	if (shouldEncrypt) {
+		response.setHeader('Content-Type', 'text/plain; charset=utf-8');
+		bcrypt.hash(messagesJson, 10, (error, hashed) => {
+			if (error) {
+				throw new Error();
+			}
+			response.end(hashed);
+		});
+	} else {
+
+		response.setHeader('Content-Type', 'application/json; charset=utf-8');
+		response.write(messagesJson);
+		response.end();
+	}
 });
 
 router.get('/message/:id', (request, response) => {
 	let id = parseInt(request.params.id, 10),
 		shouldEncrypt = parseEncrypt(request),
 		matchingMessage = messages.find(message => message.id === id);
+
+	response.setHeader('Content-Type', 'application/json; charset=utf-8');
 	
 
 	if (typeof matchingMessage !== 'object' || matchingMessage === null) {
-		response.setHeader('Content-Type', 'application/json; charset=utf-8');
 		response.statusCode = 404;
 		response.statusMessage = `Cannot find message with id ${id}`;
 	} else if (matchingMessage.constructor === Message) {
@@ -47,19 +62,16 @@ router.get('/message/:id', (request, response) => {
 		response.statusCode = 200;
 		if (shouldEncrypt) {
 			response.setHeader('Content-Type', 'text/plain; charset=utf-8');
-			console.log(matchingMessageJson);
-			bcrypt.hash(matchingMessageJson, 10, (error, hashed) => {
+			return bcrypt.hash(matchingMessageJson, 10, (error, hashed) => {
 				if (error) {
 					throw new Error();
 				}
-				response.write(hashed);
+				response.end(hashed);
 			});
 		} else {
-			response.setHeader('Content-Type', 'application/json; charset=utf-8');
 			response.write(matchingMessageJson);
 		}
 	} else {
-		response.setHeader('Content-Type', 'application/json; charset=utf-8');
 		response.statusCode = 500;
 		response.statusMessage = "Server encountered an expected error. Please contact technical support."
 	}
