@@ -7,7 +7,8 @@ const Router       = require('router');
 const router = new Router();
 
 router.get('/', (request, response) => {
-  // A good place to start!
+  //response.writeHead(200, {'Content-type': 'text/plain'});
+  reponse.write('Hello, World!');
   response.end();
 });
 
