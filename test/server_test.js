@@ -38,7 +38,7 @@ describe('server', () => {
       });
     });
 
-    it('POST request to /messsage with message data returns message id', (done) => {
+    it('POST request to /message with message data returns message id', (done) => {
       request(baseUrl)
         .post('/message')
         .send({message: "This is a test message."})
