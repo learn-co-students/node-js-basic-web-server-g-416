@@ -36,13 +36,12 @@ router.post('/message', (request, response) => {
 });
 
 router.get('/messages', (request, response) => {
-  if (request.params.encrypt === true) {
+
+    //response.writeHead(200, {'Content-Type': 'application/json; charset=utf-8'});
+    //response.end(JSON.stringify(request.params));
+
     response.writeHead(200, {'Content-Type': 'text/plain; charset=utf-8'});
-    response.end('uyp');
-  } else {
-    response.writeHead(200, {'Content-Type': 'application/json; charset=utf-8'});
-    response.end(JSON.stringify(messages));
-  }
+    response.end(request.query.encrypt);
 });
 
 router.get('/message/:id', (request, response) => {
