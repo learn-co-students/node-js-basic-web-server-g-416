@@ -4,18 +4,10 @@ const chai = require('chai');
 const expect = chai.expect;
 const should = chai.should();
 const request = require('supertest');
-const crypto = require('crypto');
+const bcrypt = require('bcrypt');
 
 const server = require('../server');
 const baseUrl = 'http://localhost:3000';
-const salt = crypto.randomBytes(16).toString('base64');
-
-const decrypt = (encryptedTxt) => {
-  const decipher = crypto.createDecipher('aes-256-ctr', salt);
-  let decrypted = decipher.update(encryptedTxt, 'hex', 'utf8');
-  decrypted += decipher.final('utf8');
-  return decrypted;
-};
 
 describe('server', () => {
 
@@ -30,8 +22,7 @@ describe('server', () => {
       .expect('Content-Type', 'text/plain; charset=utf-8')
       .end((error, response) => {
         if (error) {
-          done(error);
-          return;
+          return done(error);
         }
         response.text.should.equal("Hello, World!");
         done();
@@ -46,8 +37,7 @@ describe('server', () => {
         .expect('Content-Type', 'application/json; charset=utf-8')
         .end((error, response) => {
           if (error) {
-            done(error);
-            return;
+            return done(error);
           }
           let result = JSON.parse(response.text);
           result.should.be.a('number');
@@ -62,8 +52,7 @@ describe('server', () => {
         .expect('Content-Type', 'application/json; charset=utf-8')
         .end((error, response) => {
           if (error) {
-            done(error);
-            return;
+            return done(error);
           }
           let result = JSON.parse(response.text);
           result.should.be.a('Array');
@@ -79,8 +68,7 @@ describe('server', () => {
         .expect('Content-Type', 'application/json; charset=utf-8')
         .end((error, response) => {
           if (error) {
-            done(error);
-            return;
+            return done(error);
           }
           let result = JSON.parse(response.text);
           result.should.be.a('object');
@@ -99,10 +87,17 @@ describe('server', () => {
             done(error);
             return;
           }
-          let result = JSON.parse(decrypt(response.text));
-          result.should.be.a('object');
-          result.should.eql({id: 1, message: "This is a test message."});
-          done();
+          bcrypt.compare(
+            '{"id":1,"message":"This is a test message."}',
+            response.text,
+            (error, response) => {
+              if (error) {
+                return done(error);
+              }
+              response.should.eql(true);
+              done();
+            }
+          );
         });
     });
 
@@ -113,17 +108,24 @@ describe('server', () => {
         .expect('Content-Type', 'text/plain; charset=utf-8')
         .end((error, response) => {
           if (error) {
-            done(error);
-            return;
+            return done(error);
           }
-          let result = JSON.parse(decrypt(response.text));
-          result.should.be.a('Array');
-          result.should.eql([{id:1, message: "This is a test message."}]);
-          done();
+          bcrypt.compare(
+            '[{"id":1,"message":"This is a test message."}]',
+            response.text,
+            (error, response) => {
+              if (error) {
+                return done(error);
+              }
+              response.should.eql(true);
+              done();
+            }
+          )
         });
     });
 
   after(() => {
     server.close();
   });
+
 });
